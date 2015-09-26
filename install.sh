@@ -14,15 +14,15 @@ function backup_file {
 
 	if [ ! -f "$HOME/$FILE_NAME" ]; then
 		echo "Failed: Could not backup $FILE_NAME - $FILE_NAME does not exist!"
-    	exit 1
+		exit 1
 	fi
 
-    if [ ! -f "$HOME/$FILE_NAME.bak" ]; then
+	if [ ! -f "$HOME/$FILE_NAME.bak" ]; then
 		cp $HOME/$FILE_NAME $HOME/$FILE_NAME.bak
 		echo "Backed up $FILE_NAME to $FILE_NAME.bak"
 	else
-    	echo "Failed: Could not backup $FILE_NAME - $FILE_NAME.bak already exists."
-    	exit 1
+		echo "Failed: Could not backup $FILE_NAME - $FILE_NAME.bak already exists."
+		exit 1
 	fi
 }
 
