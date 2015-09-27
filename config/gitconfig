@@ -1,0 +1,42 @@
+[user]
+	name = Scott Dougan
+	email = scottdougan@me.com
+
+[alias]
+	br = branch
+	merged = branch --merged
+	co = checkout
+	nb = checkout -b
+	ci = commit
+	ca = commit --amend
+	df = diff
+	dc = diff --cached
+	cp = cherry-pick
+	st = status
+	gl = log --pretty=short --decorate=short --graph
+	lc = log ORIG_HEAD.. --stat --no-merges
+	rh = reset HEAD
+	po = push origin
+
+[push]
+	default = current
+
+[color]
+	branch  = auto
+	diff = auto
+	status = auto
+
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = white
+	unmerged = red
+
+[color "diff"]
+	meta = cyan
+	frag = blue
+	old = red
+	new = green
+	
+[core]
+	editor = vim
