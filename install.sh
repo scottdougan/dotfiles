@@ -4,7 +4,7 @@
 # Makes sure everything is in order before doing anything.
 function init_checks {
 	local BASH_FILE="$1"
-	local FAILED_FILES
+	local BACKUP_FILES
 
 	# Checks to make sure there are .dotfiles to be installed.
 	if [ ! -f "$HOME/.dotfiles/bash_profile" ]; then
@@ -14,7 +14,7 @@ function init_checks {
 
 	# Makes sure there isn't already a bash profile backup.
 	if [ -f "$HOME/$BASH_FILE.bak" ]; then
-		FAILED_FILES="$BASH_FILE.bak\n"
+		BACKUP_FILES="$BASH_FILE.bak\n"
 	fi
 
 	# Checks for existing config file backups.
@@ -22,13 +22,13 @@ function init_checks {
 		for FILE in $HOME/.dotfiles/config/*; do
 			local BASEFILE=$(basename "$FILE")
 			if [ -f "$HOME/.$BASEFILE.bak" ] && [ -f "$HOME/.$BASEFILE" ]; then
-				FAILED_FILES="$FAILED_FILES.$BASEFILE.bak\n"
+				BACKUP_FILES="$BACKUP_FILES.$BASEFILE.bak\n"
 			fi
 		done
 	fi
 
-	if [ -n "$FAILED_FILES" ]; then
-		echo -e "Stopped: Backup file(s) already exist \n$(echo -e "$FAILED_FILES" | tr -d '\\n')" 1>&2
+	if [ -n "$BACKUP_FILES" ]; then
+		echo -e "Stopped: Backup file(s) already exist \n$(echo -e "$BACKUP_FILES" | tr -d '\\n')" 
 		read -p "Would you like to overwrite them with the current versions of the files? (y/n):" -n 1 -r
 		if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 			echo ""
@@ -64,7 +64,7 @@ elif [[ `uname` == 'Linux' ]]; then
 	init_checks ".bashrc"
 	sym_link $HOME/.dotfiles/bash_profile $HOME/.bashrc
  else 
-	echo "Failed: Operating system \"$(uname)\" not supported"
+	echo "Failed: Operating system \"$(uname)\" not supported" 1>&2
 	exit 1
 fi
 
