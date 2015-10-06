@@ -90,7 +90,7 @@ else
 	exit 1
 fi
 
-# Install dotfiles!
+# Install dotfiles.
 if [ $# -eq 0 ]; then 
 	initChecks $BASH_FILE
 	echo -e "\n --- Installing .dotfiles! --- \n"
@@ -106,7 +106,7 @@ if [ $# -eq 0 ]; then
 			echo ""
 		done
 	 fi
-# Dotfile Uninstall
+# Uninstall dotfiles.
 elif [ $# -eq 1 ] && [ $1 == "-u" ] || [ $1 == "-Uninstall" ]; then
 	# Some basic checks
 	if [[ $(readlink $HOME/$BASH_FILE) != "$HOME/.dotfiles/bash_profile" ]]; then
