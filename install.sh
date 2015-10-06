@@ -18,14 +18,13 @@ function initChecks {
 	fi
 
 	# Checks for existing config file backups.
-	if [ -d $HOME/.dotfiles/config/ ]; then
-		for FILE in $HOME/.dotfiles/config/*; do
-			local BASEFILE=$(basename "$FILE")
-			if [ -f "$HOME/.$BASEFILE.bak" ] && [ -f "$HOME/.$BASEFILE" ]; then
-				BACKUP_FILES+=(.$BASEFILE.bak)
-			fi
-		done
-	fi
+	for FILE in $HOME/.dotfiles/config/*; do
+		local BASEFILE=$(basename "$FILE")
+		if [ -f "$HOME/.$BASEFILE.bak" ] && [ -f "$HOME/.$BASEFILE" ]; then
+			BACKUP_FILES+=(.$BASEFILE.bak)
+		fi
+	done
+	
 
 	if [ -n "$BACKUP_FILES" ]; then
 	 	echo "Stopped: Backup file(s) already exist" 
@@ -64,17 +63,21 @@ function recover {
 	local DELETE_NO_BACKUP="$2"
 
 	if [ -f $FILE.bak ]; then
-		echo "Recoving $FILE from $FILE.bak"
+		echo "Recovering $FILE from $FILE.bak"
 		rm $FILE
 		cp $FILE.bak $FILE
-	elif [ $DELETE_NO_BACKUP == 1 ]; then
-		echo "Deleting $FILE - no backup"
-		rm $FILE
-	else 
-		echo "Leaving $FILE - no backup"
-		FILE_LOCATION=$(readlink $FILE)
-		rm $FILE
-		cp $FILE_LOCATION $FILE
+	else
+		echo "File: $(basename "$FILE") does not have a backup."
+		read -p "Would you like to keep the current file? (y/n):" -n 1 -r
+		if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+			echo -e "\nKeeping original $(basename "$FILE")"
+			FILE_LOCATION=$(readlink $FILE)
+		 	rm $FILE
+		 	cp $FILE_LOCATION $FILE
+		 	return
+		fi
+		echo -e "\nDeleting $FILE - no backup"
+	 	rm $FILE
 	fi
 }
 
@@ -103,8 +106,8 @@ if [ $# -eq 0 ]; then
 			echo ""
 		done
 	 fi
-# Dotfile recovery
-elif [ $# -eq 1 ] && [ $1 == "-r" ] || [ $1 == "-Recover" ]; then
+# Dotfile Uninstall
+elif [ $# -eq 1 ] && [ $1 == "-u" ] || [ $1 == "-Uninstall" ]; then
 	# Some basic checks
 	if [[ $(readlink $HOME/$BASH_FILE) != "$HOME/.dotfiles/bash_profile" ]]; then
 		echo -e "Failed: $BASH_FILE is not linked to $HOME/.dotfiles/bash_profile \n.dotfiles are not installed." 1>&2
@@ -115,20 +118,14 @@ elif [ $# -eq 1 ] && [ $1 == "-r" ] || [ $1 == "-Recover" ]; then
 		exit 1
 	fi
 
-	echo -e "\n --- Recovering from backups! --- \n"
+	echo -e "\n --- Uinstalling .dotifles! --- \n"
 	recover $HOME/$BASH_FILE
 	BACKUP_FILES=($BASH_FILE.bak)
 	echo ""
 
 	if [ -d $HOME/.dotfiles/config/ ]; then
-		DELETE_NO_BACKUP=0
-		read -p "Would you like to delete config files without backups? (y/n):" -n 1 -r
-		if [[ $REPLY =~ ^[Yy]$ ]]; then
-			DELETE_NO_BACKUP=1
-		fi
-
 		# Recover only our config files.
-		echo -e "\n --- Recoving config files! --- \n"
+		echo -e "\n --- Recovering config files from backups --- \n"
 		for FILE in $HOME/.dotfiles/config/*; do
 			BASEFILE=$(basename "$FILE")
 			# Make sure the file is symlinked to our config folder otherwise skip it.
@@ -136,7 +133,7 @@ elif [ $# -eq 1 ] && [ $1 == "-r" ] || [ $1 == "-Recover" ]; then
 				echo -e "Error: Skipping file $HOME/.$BASEFILE \n.$BASEFILE is not linked to .dotfiles/config/* "
 				continue
 			fi
-			recover $HOME/.$BASEFILE $DELETE_NO_BACKUP
+			recover $HOME/.$BASEFILE 
 			if [ -f $HOME/.$BASEFILE.bak ]; then
 				BACKUP_FILES+=(.$BASEFILE.bak)
 			fi
@@ -154,7 +151,7 @@ elif [ $# -eq 1 ] && [ $1 == "-r" ] || [ $1 == "-Recover" ]; then
 		echo ""
 	 fi
 else 
-	echo "Usage: ./install (Optional argument: -r, --Recover)" 1>&2
+	echo "Usage: ./install (Optional argument: -u, --Uninstall)" 1>&2
 	exit;
 fi
 
