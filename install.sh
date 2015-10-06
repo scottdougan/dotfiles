@@ -149,7 +149,7 @@ elif [ $# -eq 1 ] && [ $1 == "-u" ] || [ $1 == "-Uninstall" ]; then
 			done
 		fi
 		echo ""
-	 fi
+	fi
 else 
 	echo "Usage: ./install (Optional argument: -u, --Uninstall)" 1>&2
 	exit;
