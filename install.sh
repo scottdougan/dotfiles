@@ -2,19 +2,19 @@
 #Installs dotfiles 
 
 # Makes sure everything is in order before doing anything.
-function init_checks {
+function initChecks {
 	local BASH_FILE="$1"
-	local BACKUP_FILES
+	local BACKUP_FILES=()
 
 	# Checks to make sure there are .dotfiles to be installed.
 	if [ ! -f "$HOME/.dotfiles/bash_profile" ]; then
-		echo "Stopped: $HOME/.dotfiles/bash_profile does not exist!" 1>&2
+		echo "Failed: $HOME/.dotfiles/bash_profile does not exist." 1>&2
 		exit 1
 	fi
 
 	# Makes sure there isn't already a bash profile backup.
 	if [ -f "$HOME/$BASH_FILE.bak" ]; then
-		BACKUP_FILES="$BASH_FILE.bak\n"
+		BACKUP_FILES+=($BASH_FILE.bak)
 	fi
 
 	# Checks for existing config file backups.
@@ -22,23 +22,25 @@ function init_checks {
 		for FILE in $HOME/.dotfiles/config/*; do
 			local BASEFILE=$(basename "$FILE")
 			if [ -f "$HOME/.$BASEFILE.bak" ] && [ -f "$HOME/.$BASEFILE" ]; then
-				BACKUP_FILES="$BACKUP_FILES.$BASEFILE.bak\n"
+				BACKUP_FILES+=(.$BASEFILE.bak)
 			fi
 		done
 	fi
 
 	if [ -n "$BACKUP_FILES" ]; then
-		echo -e "Stopped: Backup file(s) already exist \n$(echo -e "$BACKUP_FILES" | tr -d '\\n')" 
+	 	echo "Stopped: Backup file(s) already exist" 
+	 	for FILE in "${BACKUP_FILES[@]}"; do
+			echo $FILE
+		done
 		read -p "Would you like to overwrite them with the current versions of the files? (y/n):" -n 1 -r
+		echo ""
 		if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-			echo ""
 			exit 1
 		fi
 	fi
-	echo -e "\n --- Installing .dotfiles! --- \n"
 }
 
-function backup_file {
+function backupFile {
 	local FILE="$1"
 
 	if [ -f "$FILE" ]; then
@@ -47,35 +49,113 @@ function backup_file {
 	fi
 }
 
-function sym_link {
+function symLink {
 	local FROM="$1"
 	local TO="$2"
 
-	backup_file $TO
+	backupFile $TO
 	echo "Linking $FROM -> $TO"
  	rm -f $TO
  	ln -s $FROM $TO
 }
 
-if [[ `uname` == 'Darwin' ]]; then
-	init_checks ".bash_profile"
-	sym_link $HOME/.dotfiles/bash_profile $HOME/.bash_profile
-elif [[ `uname` == 'Linux' ]]; then
-	init_checks ".bashrc"
-	sym_link $HOME/.dotfiles/bash_profile $HOME/.bashrc
- else 
-	echo "Failed: Operating system \"$(uname)\" not supported" 1>&2
+function recover {
+	local FILE="$1"
+	local DELETE_NO_BACKUP="$2"
+
+	if [ -f $FILE.bak ]; then
+		echo "Recoving $FILE from $FILE.bak"
+		rm $FILE
+		cp $FILE.bak $FILE
+	elif [ $DELETE_NO_BACKUP == 1 ]; then
+		echo "Deleting $FILE - no backup"
+		rm $FILE
+	else 
+		echo "Leaving $FILE - no backup"
+		FILE_LOCATION=$(readlink $FILE)
+		rm $FILE
+		cp $FILE_LOCATION $FILE
+	fi
+}
+
+if [ $(uname) == "Darwin" ]; then
+	BASH_FILE=".bash_profile"
+elif [ $(uname) == 'Linux' ]; then
+	BASH_FILE=".bashrc"
+else 
+	echo "Failed: Operating system \"$(uname)\" not supported." 1>&2
 	exit 1
 fi
 
-# Fianlly Link all the config files.
-echo -e "\n --- Linking config files! --- \n"
-if [ -d $HOME/.dotfiles/config/ ]; then
-	for FILE in $HOME/.dotfiles/config/*; do
-		BASEFILE=$(basename "$FILE")
-		sym_link $HOME/.dotfiles/config/$BASEFILE $HOME/.$BASEFILE
+# Install dotfiles!
+if [ $# -eq 0 ]; then 
+	initChecks $BASH_FILE
+	echo -e "\n --- Installing .dotfiles! --- \n"
+	symLink $HOME/.dotfiles/bash_profile $HOME/$BASH_FILE
+	echo ""
+
+	# Fianlly Link all the config files.
+	if [ -d $HOME/.dotfiles/config/ ]; then
+		echo -e " --- Linking config files! --- \n"
+		for FILE in $HOME/.dotfiles/config/*; do
+			BASEFILE=$(basename "$FILE")
+			symLink $HOME/.dotfiles/config/$BASEFILE $HOME/.$BASEFILE
+			echo ""
+		done
+	 fi
+# Dotfile recovery
+elif [ $# -eq 1 ] && [ $1 == "-r" ] || [ $1 == "-Recover" ]; then
+	# Some basic checks
+	if [[ $(readlink $HOME/$BASH_FILE) != "$HOME/.dotfiles/bash_profile" ]]; then
+		echo -e "Failed: $BASH_FILE is not linked to $HOME/.dotfiles/bash_profile \n.dotfiles are not installed." 1>&2
+		exit;
+	fi
+	if [ ! -f "$HOME/$BASH_FILE.bak" ]; then
+		echo "Failed: $BASH_FILE.bak does not exist." 1>&2
+		exit 1
+	fi
+
+	echo -e "\n --- Recovering from backups! --- \n"
+	recover $HOME/$BASH_FILE
+	BACKUP_FILES=($BASH_FILE.bak)
+	echo ""
+
+	if [ -d $HOME/.dotfiles/config/ ]; then
+		DELETE_NO_BACKUP=0
+		read -p "Would you like to delete config files without backups? (y/n):" -n 1 -r
+		if [[ $REPLY =~ ^[Yy]$ ]]; then
+			DELETE_NO_BACKUP=1
+		fi
+
+		# Recover only our config files.
+		echo -e "\n --- Recoving config files! --- \n"
+		for FILE in $HOME/.dotfiles/config/*; do
+			BASEFILE=$(basename "$FILE")
+			# Make sure the file is symlinked to our config folder otherwise skip it.
+			if [[ $(readlink $HOME/.$BASEFILE) != "$HOME/.dotfiles/config/$BASEFILE" ]]; then
+				echo -e "Error: Skipping file $HOME/.$BASEFILE \n.$BASEFILE is not linked to .dotfiles/config/* "
+				continue
+			fi
+			recover $HOME/.$BASEFILE $DELETE_NO_BACKUP
+			if [ -f $HOME/.$BASEFILE.bak ]; then
+				BACKUP_FILES+=(.$BASEFILE.bak)
+			fi
+		done
 		echo ""
-	done
+		read -p "Would you like to delete the backup files? (y/n):" -n 1 -r
+		echo ""
+		if [[ $REPLY =~ ^[Yy]$ ]]; then
+			echo -e "\nDeleting backup files:"
+			for FILE in "${BACKUP_FILES[@]}"; do
+				echo $FILE
+				rm -f $HOME/$FILE
+			done
+		fi
+		echo ""
+	 fi
+else 
+	echo "Usage: ./install (Optional argument: -r, --Recover)" 1>&2
+	exit;
 fi
 
 echo " --- Success! ---"
