@@ -1,0 +1,3 @@
+[submodule "scripts/gnome-terminal-colors-solarized"]
+	path = scripts/gnome-terminal-colors-solarized
+	url = https://github.com/Anthony25/gnome-terminal-colors-solarized
