@@ -166,16 +166,18 @@ function uninstall {
 				BACKUP_FILES+=(.$BASEFILE.bak)
 			fi
 		done
-		read -p "Would you like to delete the backup files? (y/n):" -n 1 -r
-		echo ""
-		if [[ $REPLY =~ ^[Yy]$ ]]; then
-			echo -e "\nDeleting backup files:"
-			for FILE in "${BACKUP_FILES[@]}"; do
-				echo $FILE
-				rm -f $HOME/$FILE
-			done
+		if [ -n "$BACKUP_FILES" ]; then
+			read -p "Would you like to delete the backup files? (y/n):" -n 1 -r
+			echo ""
+			if [[ $REPLY =~ ^[Yy]$ ]]; then
+				echo -e "\nDeleting backup files:"
+				for FILE in "${BACKUP_FILES[@]}"; do
+					echo $FILE
+					rm -f $HOME/$FILE
+				done
+			fi
+			echo ""
 		fi
-		echo ""
 	fi
 }
 
