@@ -162,7 +162,7 @@ function uninstall {
 			fi
 			recover $HOME/.$BASEFILE
 			echo ""
-			if [ -f $HOME/.$BASEFILE.bak ]; then
+			if [ -f "$HOME/.$BASEFILE.bak" ]; then
 				BACKUP_FILES+=(.$BASEFILE.bak)
 			fi
 		done
@@ -184,8 +184,10 @@ function uninstall {
 # Main 
 if [ $(uname) == "Darwin" ]; then
 	BASH_FILE=".bash_profile"
+	PLATFORM="mac"
 elif [ $(uname) == 'Linux' ]; then
 	BASH_FILE=".bashrc"
+	PLATFORM="linux"
 else 
 	echo "Failed: Operating system \"$(uname)\" not supported." 1>&2
 	exit 1
@@ -202,6 +204,7 @@ if [ $# == 0 ] && [[ $(readlink $HOME/$BASH_FILE) == "$HOME/.dotfiles/bash_profi
 # Fresh Install of dotfiles.
 elif [ $# == 0 ]; then
 	freshInstall $BASH_FILE
+	scripts/install.sh $PLATFORM
 # Uninstall dotfiles.
 elif [ $# == 1 ] && [ $1 == "-u" ] || [ $1 == "-Uninstall" ]; then
 	uninstall $BASH_FILE
