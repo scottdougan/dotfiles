@@ -14,26 +14,22 @@ BR_RED="\[\033[1;31m\]"
 BR_MAGENTA="\[\033[1;35m\]"
 RESET="\[\033[0m\]"
 
-PROMPT_COMMAND=prompt
-
 # Grep colour
 export GREP_OPTIONS='--color=auto'
 export GREP_COLOR='1;32'
 
-if [[ $PLATFORM == "mac" ]]; then
-    # Load git_completion for __git_ps1
-    if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
-        source $(brew --prefix)/etc/bash_completion
-        PROMPT_COMMAND=git_prompt
-    fi
-elif [[ $PLATFORM == "linux" ]]; then
+PROMPT_COMMAND=prompt
+if [ -f "$HOME/.dotfiles/scripts/git-prompt.sh" ]; then
     # Load git_prompt for __git_ps1
-    if [ -f "$HOME/.dotfiles/scripts/git-prompt.sh" ]; then
-        source $HOME/.dotfiles/scripts/git-prompt.sh
-        PROMPT_COMMAND=git_prompt
-    fi
+    source $HOME/.dotfiles/scripts/git-prompt.sh
+    PROMPT_COMMAND=git_prompt
 fi
 
+if [[ $PLATFORM == "mac" ]] && [ -f "$(brew --prefix)/etc/bash_completion" ]; then
+    source $(brew --prefix)/etc/bash_completion
+fi
+
+# Customize the prompt
 prompt () {
     local exit_status=${1:-$?} # Save exit status since the if statments below will change it.
     local host
