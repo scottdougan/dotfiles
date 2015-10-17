@@ -1,5 +1,4 @@
 #!/bin/bash
-#Author: Scott Dougan
 #Personal dotfiles
 
 PLATFORM='unknown'
@@ -10,10 +9,9 @@ elif [[ `uname` == 'Linux' ]]; then
 fi
 export PLATFORM
 
-# Load dotfiles
+# Load other scoures from the include folder
 if [ -d $HOME/.dotfiles ]; then
-	export DOTFILES_DIR="$HOME/.dotfiles"
-	for file in $DOTFILES_DIR/include/*
+	for file in "$HOME/.dotfiles/include/*"
 	do
 		source $file
 	done
