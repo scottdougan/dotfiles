@@ -26,13 +26,10 @@ if [[ $PLATFORM == "mac" ]]; then
         source $(brew --prefix)/etc/bash_completion
         PROMPT_COMMAND=git_prompt
     fi
-
 elif [[ $PLATFORM == "linux" ]]; then
     # Load git_prompt for __git_ps1
     if [ -f "$HOME/.dotfiles/scripts/git-prompt.sh" ]; then
         source $HOME/.dotfiles/scripts/git-prompt.sh
-        PROMPT_COMMAND=git_prompt
-    else
         PROMPT_COMMAND=git_prompt
     fi
 fi
@@ -42,7 +39,7 @@ prompt () {
     local host
     local venv
     local git_branch=$2
-    local date="$GREEN[$CYAN\D{%H:%M:%S}$GREEN]$RESET"
+    local current_time="$GREEN[$CYAN\D{%H:%M:%S}$GREEN]$RESET"
 
     if [[ -n $SSH_CLIENT ]]; then
         host=@$WHITE$(echo "$HOSTNAME" | cut -d '.' -f 1)$RESET
@@ -52,10 +49,10 @@ prompt () {
         venv="$WHITE(${VIRTUAL_ENV##*/}) $RESET"
     fi
 
-    if [ ! "$exit_status" -eq 0 ]; then
-        date="$RED[$CYAN\D{%H:%M:%S}$RED]$RESET"
+    if [[ $exit_status != 0 ]]; then
+        current_time="$RED[$CYAN\D{%H:%M:%S}$RED]$RESET"
     fi
-    PS1="${venv}${date} \u${host}:\W$git_branch$RESET\n\$ "
+    PS1="${venv}${current_time} \u${host}:\W$git_branch$RESET\n\$ "
 }
 
 git_prompt () {
