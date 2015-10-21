@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 #Referenced from Mark Story and Alex Vermeulen.
 #This script customizes the appearance of the shell.
 

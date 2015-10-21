@@ -11,8 +11,7 @@ export PLATFORM
 
 # Load other scoures from the include folder
 if [ -d $HOME/.dotfiles ]; then
-	for file in "$HOME/.dotfiles/include/*"
-	do
+	for file in $HOME/.dotfiles/include/*; do
 		source $file
 	done
 fi
