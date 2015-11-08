@@ -8,15 +8,11 @@ tap 'caskroom/versions' # For Sublime Text 3
 brew 'caskroom/cask/brew-cask'
 brew 'bash-completion'
 brew 'git'
-brew 'imagemagick'
 brew 'macvim'
-brew 'php-code-sniffer' # Used by SublimeLinter-phpcs
 brew 'python'
 brew 'python3'
 brew 'shellcheck' # Used by SublimeLinter-shellcheck
 
 # Install Cask Apps
 cask 'google-chrome'
-cask 'liteicon'
-cask 'omnigraffle'
 cask 'sublime-text3'

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Aliases
+# General Aliases
 
 # # Mac
 if [[ $PLATFORM == 'mac' ]]; then

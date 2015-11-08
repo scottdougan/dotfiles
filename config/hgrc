@@ -1,0 +1,34 @@
+# example user config (see "hg help config" for more info)
+[ui]
+# name and email, e.g.
+username = Scott Dougan <scott@getsensibill.com>
+merge = internal:merge
+
+[extensions]
+histedit=
+shelve=
+prompt=~/.prompt.py
+color=
+progress=
+purge=
+mq=
+hgcontains=~/.contains.py
+
+[alias]
+updef = update default
+upstag = update release_staging
+upprod = update release_production
+pup = pull --update
+logbr = log --branch .
+logvbr = log --verbose --branch .
+logv = log --verbose
+pushbr = push --branch .
+pushnewbr = push --branch . --new-branch
+pnbr = pushnewbr
+pbr = pushbr
+outbr = outgoing --branch .
+bl = blame -duncl
+parent = log -r "parents(min(branch(.))"
+gr = grep --all --ignore-case
+prodcontains = contains --child release_production
+stagcontains = contains --child release_staging
