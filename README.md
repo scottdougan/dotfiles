@@ -11,7 +11,7 @@ Everything here will be symlinked to the user's home directory with a `.` append
 All the files located here are scoured from the `bash_profile`.  This makes the `bash_profile` a little more organized by separating critical parts into small manageable files.  This effectively allows me to find bugs, add new features or change current terminal behaviour. 
 
 ### `scripts/`
-This folder contains various helper scripts.  For example, two of the scripts (depending on if you're on Mac or Linux) will set the terminal coloured to be solorized (Dark or Light).  While others as such `git_prompt.sh` help with terminal appearance by showing the user which git branch they are currently on under Linux.  This is also a place where I put useful scripts I may need so I don't forget where they are in the future.
+This folder contains various helper scripts.  For example, two of the scripts (depending on if you're on Mac or Linux) will set the terminal coloured to be solorized (Dark or Light).  While others such as `git_prompt.sh` help with terminal appearance by showing the user which git branch they are currently on under Linux.  This is also a place where I put useful scripts I may need so I don't forget where they are in the future.
 
 
 ## Installation
