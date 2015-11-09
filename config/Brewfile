@@ -17,3 +17,4 @@ brew 'shellcheck' # Used by SublimeLinter-shellcheck
 cask 'google-chrome'
 cask 'sublime-text3'
 cask 'slack'
+cask 'spotify'
