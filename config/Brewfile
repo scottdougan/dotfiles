@@ -16,3 +16,4 @@ brew 'shellcheck' # Used by SublimeLinter-shellcheck
 # Install Cask Apps
 cask 'google-chrome'
 cask 'sublime-text3'
+cask 'slack'
