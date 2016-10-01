@@ -44,6 +44,15 @@ elif [[ $PLATFORM == "linux" ]]; then
     fi
 fi
 
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+
 prompt () {
     local exit_status=${1:-$?} # Save exit status since the if statments below will change it.
     local host
