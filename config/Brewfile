@@ -2,19 +2,20 @@
 # Scott's brewfile
 
 # Taps
-tap 'caskroom/versions' # For Sublime Text 3
+tap 'caskroom/cask'
 
 # Install Homebrew packages
-brew 'caskroom/cask/brew-cask'
 brew 'bash-completion'
 brew 'git'
-brew 'macvim'
-brew 'python'
+brew 'node'
+brew 'phantomjs'
 brew 'python3'
 brew 'shellcheck' # Used by SublimeLinter-shellcheck
+brew 'wget'
 
 # Install Cask Apps
 cask 'google-chrome'
-cask 'sublime-text3'
+cask 'sublime-text'
+cask 'iterm2'
 cask 'slack'
 cask 'spotify'
